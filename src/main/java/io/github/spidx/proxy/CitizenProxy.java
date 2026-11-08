@@ -102,10 +102,5 @@ public class CitizenProxy implements IProxy {
         }
     }
 
-    private RuntimeException DatabaseError(SQLException error) {
-        return new IllegalStateException(
-                "Не удалось выполнить операцию с базой данных. Проверьте подключение и введённые данные.",
-                error
-        );
-    }
+
 }
