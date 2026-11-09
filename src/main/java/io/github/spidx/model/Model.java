@@ -9,11 +9,11 @@ public abstract class Model {
         _id = id;
     }
 
-    public UUID getId() {
+    public UUID GetId() {
         return _id;
     }
 
-    public void setId(UUID id) {
+    public void SetId(UUID id) {
         _id = id;
     }
 }

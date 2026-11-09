@@ -4,8 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.UUID;
+import java.util.Objects;
 
-public class Citizen extends Model {
+public class Citizen extends Model implements IUpdateable<Citizen> {
     private String _fullName;
     private LocalDate _dateOfBirth;
     private int _passportSeries;
@@ -22,6 +23,7 @@ public class Citizen extends Model {
     public String GetFullName() {
         return _fullName;
     }
+
     public void SetFullName(String fullName) {
         _fullName = fullName;
     }
@@ -29,6 +31,7 @@ public class Citizen extends Model {
     public LocalDate getDateOfBirth() {
         return _dateOfBirth;
     }
+
     public void SetDateOfBirth(LocalDate dateOfBirth) {
         _dateOfBirth = dateOfBirth;
     }
@@ -36,6 +39,7 @@ public class Citizen extends Model {
     public int GetPassportSeries() {
         return _passportSeries;
     }
+
     public void SetPassportSeries(int passportSeries) {
         _passportSeries = passportSeries;
     }
@@ -43,8 +47,29 @@ public class Citizen extends Model {
     public int GetPassportNumber() {
         return _passportNumber;
     }
+
     public void SetPassportNumber(int passportNumber) {
         _passportNumber = passportNumber;
+    }
+
+    @Override
+    public Citizen Update(Citizen otherCitizen) {
+        if (otherCitizen == null) {
+            return this;
+        }
+
+        this.SetId(otherCitizen.GetId() != null ? otherCitizen.GetId() : this.GetId());
+        this.SetFullName(Objects.requireNonNullElse(otherCitizen.GetFullName(), this.GetFullName()));
+        this.SetDateOfBirth(Objects.requireNonNullElse(otherCitizen.getDateOfBirth(), this.getDateOfBirth()));
+
+        if (otherCitizen.GetPassportSeries() != 0) {
+            this.SetPassportSeries(otherCitizen.GetPassportSeries());
+        }
+        if (otherCitizen.GetPassportNumber() != 0) {
+            this.SetPassportNumber(otherCitizen.GetPassportNumber());
+        }
+
+        return this;
     }
 
     public static Citizen TryParse(ResultSet resultSet) throws SQLException {
@@ -53,7 +78,6 @@ public class Citizen extends Model {
                 resultSet.getString("full_name"),
                 resultSet.getDate("date_of_birth").toLocalDate(),
                 resultSet.getInt("passport_series"),
-                resultSet.getInt("passport_series")
-        );
+                resultSet.getInt("passport_series"));
     }
 }
