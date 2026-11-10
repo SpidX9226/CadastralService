@@ -27,7 +27,7 @@ public class CitizenService {
         }
 
         if (citizen.GetId() != null) {
-            if (_citizenProxy.GetById(citizen.getId()) != null) {
+            if (_citizenProxy.GetById(citizen.GetId()) != null) {
                 // todo: replace with bussines specific error
                 throw new RuntimeException("temp: replace with an actual message");
             }
