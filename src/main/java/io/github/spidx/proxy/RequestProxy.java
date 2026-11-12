@@ -32,7 +32,7 @@ public class RequestProxy implements IProxy {
             statement.setObject(4, request.GetOpenAt());
             statement.setObject(5, request.GetClosedAt());
 
-            return statement.execute();
+            return statement.executeUpdate() > 0;
         } catch (SQLException err) {
             throw this.DatabaseError(err);
         }

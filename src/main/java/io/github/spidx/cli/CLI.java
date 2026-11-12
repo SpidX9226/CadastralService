@@ -76,6 +76,138 @@ public class CLI {
                         """);
     }
 
+    private static void OpenRequestsMenu() {
+        while (true) {
+            IO.println("""
+
+                ==================== Requests ====================
+
+                1. List all requests
+                2. Create request
+                3. Find request by ID
+                4. Update request
+                5. Delete request
+                0. Return to main menu
+                """);
+
+            switch (ReadOption("Enter an option: ", 0, 5)) {
+                case 0 -> {
+                    return;
+                }
+                case 1 -> PrintAllRequests();
+                case 2 -> CreateRequest();
+                case 3 -> FindRequestById();
+                case 4 -> UpdateRequest();
+                case 5 -> DeleteRequest();
+            }
+        }
+    }
+
+    private static void CreateRequest() {
+        IO.println("\n=== Create Request ===");
+
+        UUID citizenId = ReadUUID("Enter citizen ID: ");
+
+        // Make sure the citizen exists before creating the request.
+        CitizenService.GetById(citizenId);
+
+        Status status = ReadStatus(
+                "Enter status (NEW, IN_PROGRESS, DONE, CANCELLED): "
+        );
+
+        OffsetDateTime openAt = ReadDateTime("Enter opening date: ");
+        OffsetDateTime closedAt = ReadOptionalDateTime(
+                "Enter closing date (leave empty if not closed): "
+        );
+
+        Request request = new Request(
+                UUID.randomUUID(),
+                citizenId,
+                status,
+                openAt,
+                closedAt
+        );
+
+        RequestService.Add(request);
+
+        IO.println("Request successfully created!");
+        Print(request);
+    }
+
+    private static void UpdateRequest() {
+        IO.println("\n=== Update Request ===");
+
+        UUID id = ReadUUID("Enter request ID: ");
+
+        // Check that the request exists.
+        RequestService.GetById(id);
+
+        UUID citizenId = ReadUUID("Enter new citizen ID: ");
+        CitizenService.GetById(citizenId);
+
+        Status status = ReadStatus(
+                "Enter new status (NEW, IN_PROGRESS, DONE, CANCELLED): "
+        );
+
+        OffsetDateTime openAt = ReadDateTime("Enter new opening date: ");
+        OffsetDateTime closedAt = ReadOptionalDateTime(
+                "Enter new closing date (leave empty if not closed): "
+        );
+
+        Request updatedRequest = new Request(
+                id,
+                citizenId,
+                status,
+                openAt,
+                closedAt
+        );
+
+        RequestService.Update(updatedRequest);
+
+        IO.println("Request successfully updated!");
+        Print(RequestService.GetById(id));
+    }
+
+    private static void DeleteRequest() {
+        IO.println("\n=== Delete Request ===");
+
+        UUID id = ReadUUID("Enter request ID: ");
+
+        Request request = RequestService.GetById(id);
+        Print(request);
+
+        String confirmation = IO.readln(
+                "Are you sure you want to delete this request? (y/N): "
+        );
+
+        if (!"y".equalsIgnoreCase(confirmation.trim())) {
+            IO.println("Deletion cancelled.");
+            return;
+        }
+
+        RequestService.Delete(id);
+
+        IO.println("Request successfully deleted!");
+    }
+
+    private static OffsetDateTime ReadOptionalDateTime(String msg) {
+        while (true) {
+            String line = IO.readln(msg);
+
+            if (line == null || line.isBlank()) {
+                return null;
+            }
+
+            try {
+                return OffsetDateTime.parse(line.trim());
+            } catch (DateTimeParseException e) {
+                IO.println(
+                        "Invalid date format. Expected ISO 8601: " +
+                                "2026-11-12T16:30:00+01:00"
+                );
+            }
+        }
+    }
 
     private static void PrintStatistic() {
         List<Citizen> citizens = CitizenService.GetAll();
@@ -192,8 +324,8 @@ public class CLI {
     }
 
     static void FindRequestById() {
-        UUID id = ReadUUID("Enter citizen's ID(UUID): ");
-        Print(CitizenService.GetById(id));
+        UUID id = ReadUUID("Enter request ID (UUID): ");
+        Print(RequestService.GetById(id));
     }
 
     static void FindRequestsByCitizensId() {
@@ -354,12 +486,14 @@ public class CLI {
 
     static Status ReadStatus(String msg) {
         while (true) {
-            var line = IO.readln(msg);
+            String line = IO.readln(msg);
 
             try {
-                return Status.valueOf(line);
-            } catch (IllegalArgumentException e) {
-                IO.println("Enter a valid status name: (new, in_progress, done, canceled)");
+                return Status.valueOf(line.trim().toUpperCase());
+            } catch (IllegalArgumentException | NullPointerException e) {
+                IO.println(
+                        "Valid statuses: NEW, IN_PROGRESS, DONE, CANCELLED"
+                );
             }
         }
     }
@@ -374,7 +508,7 @@ public class CLI {
                 var line = IO.readln(msg);
                 int res = Integer.parseInt(line);
 
-                if ((res >= 0) && (res <= 12)) {
+                if ((res >= lower) && (res <= higher)) {
                     return res;
                 } else {
                     isValid = false;
