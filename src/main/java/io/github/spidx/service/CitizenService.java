@@ -4,6 +4,8 @@ import java.lang.RuntimeException;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.spidx.exception.BusinessException;
+import io.github.spidx.exception.CitizenNotFoundException;
 import org.jetbrains.annotations.NotNull;
 
 import io.github.spidx.proxy.*;
@@ -18,21 +20,19 @@ public class CitizenService {
 
     public static void Add(Citizen citizen) {
         if (StringExtension.IsNullOrEmpty(citizen.GetFullName())) {
-            // todo: replace with bussines specific error
-            throw new RuntimeException("temp: replace with an actual message");
+            throw new BusinessException("Citizen's name cannot be empty");
         }
 
         if (citizen.GetId() != null) {
             if (_citizenProxy.GetById(citizen.GetId()) != null) {
-                // todo: replace with bussines specific error
-                throw new RuntimeException("temp: replace with an actual message");
+                throw new BusinessException("Citizen's Id cannot be empty");
             }
         } else {
             citizen.SetId(UUID.randomUUID());
         }
 
         if (!(_citizenProxy.Add(citizen))) {
-            throw new RuntimeException("Unable to Add the Citizen");
+            throw new BusinessException("Unable to Add the Citizen");
         }
     }
 
@@ -43,14 +43,13 @@ public class CitizenService {
     @NotNull
     public static Citizen GetById(UUID id) {
         if (id == null) {
-            throw new RuntimeException("There is cannot be a citizen with id: null");
+            throw new BusinessException("There is cannot be a citizen with id: null");
         }
 
         var citizen = _citizenProxy.GetById(id);
 
         if (citizen == null) {
-            // todo: replace with a proper exception
-            throw new RuntimeException("temp");
+            throw new CitizenNotFoundException("temp");
         }
 
         return citizen;

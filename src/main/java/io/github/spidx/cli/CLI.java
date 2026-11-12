@@ -1,5 +1,6 @@
 package io.github.spidx.cli;
 
+import io.github.spidx.exception.EntityNotFoundException;
 import io.github.spidx.model.Citizen;
 import io.github.spidx.model.Request;
 import io.github.spidx.model.Status;
@@ -33,7 +34,7 @@ public class CLI {
                     PrintAllCitizens();
                     break;
                 case 2:
-                    PrintAllRequests();
+                    OpenRequestsMenu();
                     break;
                 case 3:
                     OpenFindMenu();
@@ -109,7 +110,13 @@ public class CLI {
         UUID citizenId = ReadUUID("Enter citizen ID: ");
 
         // Make sure the citizen exists before creating the request.
-        CitizenService.GetById(citizenId);
+        try {
+            CitizenService.GetById(citizenId);
+        } catch (EntityNotFoundException e) {
+            IO.println("Unable to find citizen with this id");
+            return;
+        }
+
 
         Status status = ReadStatus(
                 "Enter status (NEW, IN_PROGRESS, DONE, CANCELLED): "
