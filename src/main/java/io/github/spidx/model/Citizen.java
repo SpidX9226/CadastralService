@@ -78,6 +78,6 @@ public class Citizen extends Model implements IUpdateable<Citizen> {
                 resultSet.getString("full_name"),
                 resultSet.getDate("date_of_birth").toLocalDate(),
                 resultSet.getInt("passport_series"),
-                resultSet.getInt("passport_series"));
+                resultSet.getInt("passport_number"));
     }
 }
