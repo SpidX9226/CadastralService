@@ -26,7 +26,7 @@ public class CitizenProxy implements IProxy {
                     """;
 
         try (var connection = Database.getConnection(); var statement = connection.prepareStatement(cmd)) {
-            statement.setObject(1, model.getId());
+            statement.setObject(1, model.GetId());
             statement.setString(2, citizen.GetFullName());
             statement.setDate(3, Date.valueOf(citizen.getDateOfBirth()));
             statement.setInt(4, citizen.GetPassportSeries());

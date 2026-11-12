@@ -26,7 +26,7 @@ public class RequestProxy implements IProxy {
                     """;
 
         try (var connection = Database.getConnection(); var statement = connection.prepareStatement(cmd)) {
-            statement.setObject(1, request.getId());
+            statement.setObject(1, request.GetId());
             statement.setObject(2, request.GetCitizenId());
             statement.setString(3, request.GetStatus().toString());
             statement.setObject(4, request.GetOpenAt());
@@ -89,7 +89,7 @@ public class RequestProxy implements IProxy {
             statement.setString(2, request.GetStatus().toString());
             statement.setObject(3, request.GetOpenAt());
             statement.setObject(4, request.GetClosedAt());
-            statement.setObject(5, request.getId());
+            statement.setObject(5, request.GetId());
 
             return statement.executeUpdate() > 0;
         } catch (SQLException err) {

@@ -5,22 +5,18 @@ import java.util.List;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import io.github.spidx.proxy.*;
 import io.github.spidx.util.StringExtension;
 import io.github.spidx.model.*;
 
 public class CitizenService {
-    private final CitizenProxy _citizenProxy;
-    private final RequestProxy _requestProxy;
+    private static final CitizenProxy _citizenProxy = new CitizenProxy();
 
     public CitizenService(CitizenProxy citizenProxy, RequestProxy requestProxy) {
-        _citizenProxy = citizenProxy;
-        _requestProxy = requestProxy;
     }
 
-    public void Add(Citizen citizen) {
+    public static void Add(Citizen citizen) {
         if (StringExtension.IsNullOrEmpty(citizen.GetFullName())) {
             // todo: replace with bussines specific error
             throw new RuntimeException("temp: replace with an actual message");
@@ -40,12 +36,12 @@ public class CitizenService {
         }
     }
 
-    public List<Citizen> GetAll() {
+    public static List<Citizen> GetAll() {
         return _citizenProxy.GetAll();
     }
 
     @NotNull
-    public Citizen GetById(UUID id) {
+    public static Citizen GetById(UUID id) {
         if (id == null) {
             throw new RuntimeException("There is cannot be a citizen with id: null");
         }
@@ -60,14 +56,14 @@ public class CitizenService {
         return citizen;
     }
 
-    public void Update(Citizen citizen) {
+    public static void Update(Citizen citizen) {
         var oldCitizen = GetById(citizen.GetId());
         citizen = oldCitizen.Update(citizen);
 
         _citizenProxy.Update(citizen);
     }
 
-    public void Delete(UUID id) {
+    public static void Delete(UUID id) {
         GetById(id);
 
         _citizenProxy.Delete(id);
