@@ -2,6 +2,7 @@ package io.github.spidx.proxy;
 
 import io.github.spidx.model.Model;
 import io.github.spidx.model.Request;
+import io.github.spidx.model.Status;
 import io.github.spidx.util.Database;
 import org.jetbrains.annotations.Nullable;
 

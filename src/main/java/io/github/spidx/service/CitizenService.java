@@ -2,6 +2,7 @@ package io.github.spidx.service;
 
 import java.lang.RuntimeException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import io.github.spidx.exception.BusinessException;
@@ -53,6 +54,24 @@ public class CitizenService {
         }
 
         return citizen;
+    }
+
+
+    public static Citizen GetCitizenByName(String name) {
+        if(StringExtension.IsNullOrEmpty(name)) {
+            throw new BusinessException("");
+        }
+
+        var res = _citizenProxy.GetAll()
+                .stream()
+                .filter(citizen -> Objects.equals(citizen.GetFullName(), name))
+                .findFirst();
+
+        if (res.isEmpty()) {
+            throw new CitizenNotFoundException("Citizen with this name is not found: " + name);
+        }
+
+        return res.get();
     }
 
     public static void Update(Citizen citizen) {

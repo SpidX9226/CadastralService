@@ -109,7 +109,6 @@ public class CLI {
 
         UUID citizenId = ReadUUID("Enter citizen ID: ");
 
-        // Make sure the citizen exists before creating the request.
         try {
             CitizenService.GetById(citizenId);
         } catch (EntityNotFoundException e) {
@@ -217,28 +216,14 @@ public class CLI {
     }
 
     private static void PrintStatistic() {
-        List<Citizen> citizens = CitizenService.GetAll();
-        List<Request> requests = RequestService.GetAll();
+        // all variables here represent count
+        int citizens = CitizenService.GetAll().size();
+        int requests = RequestService.GetAll().size();
 
-        var newRequests = requests
-                .stream()
-                .filter(item -> Objects.equals(item.GetStatus(), Status.NEW))
-                .count();
-
-        var activeRequests = requests
-                .stream()
-                .filter(item -> Objects.equals(item.GetStatus(), Status.IN_PROGRESS))
-                .count();
-
-        var doneRequests = requests
-                .stream()
-                .filter(item -> Objects.equals(item.GetStatus(), Status.DONE))
-                .count();
-
-        var completedRequests = requests
-                .stream()
-                .filter(item -> Objects.equals(item.GetStatus(), Status.CANCELLED))
-                .count();
+        int newRequests = RequestService.GetByStatus(Status.NEW).size();
+        int activeRequests = RequestService.GetByStatus(Status.IN_PROGRESS).size();
+        int doneRequests = RequestService.GetByStatus(Status.DONE).size();
+        int completedRequests = RequestService.GetByStatus(Status.CANCELLED).size();
 
         String statistics = String.format("""
                 Total Number of Citizens in the System: %d
@@ -247,7 +232,7 @@ public class CLI {
                 Number of Active Requests:              %d
                 Number of Completed Requests:           %d
                 Number of Cancelled Requests:           %d
-                """, citizens.size(), requests.size(), newRequests, activeRequests, doneRequests, completedRequests);
+                """, citizens, requests, newRequests, activeRequests, doneRequests, completedRequests);
 
         IO.println(statistics);
     }
@@ -316,18 +301,11 @@ public class CLI {
     }
 
     static void FindCitizenByName() {
-        List<Citizen> citizens = CitizenService.GetAll();
-
         var line = IO.readln("Enter FullName: ");
 
-        var res = citizens
-                .stream()
-                .filter(item -> Objects.equals(item.GetFullName(), line))
-                .toList();
+        var citizen = CitizenService.GetCitizenByName(line);
 
-        for (var citizen : res) {
-            Print(citizen);
-        }
+        Print(citizen);
     }
 
     static void FindRequestById() {
@@ -335,7 +313,7 @@ public class CLI {
         Print(RequestService.GetById(id));
     }
 
-    static void FindRequestsByCitizensId() {
+     static void FindRequestsByCitizensId() {
         List<Request> requests = RequestService.GetAll();
 
         UUID id = ReadUUID("Enter citizen's ID(UUID): ");

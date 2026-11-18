@@ -35,6 +35,15 @@ public class RequestService {
         return result;
     }
 
+    public static List<Request> GetByStatus(Status status) {
+        List<Request> allRequests = REQUEST_PROXY.GetAll();
+
+        return allRequests
+                .stream()
+                .filter(request -> request.GetStatus().equals(status))
+                .toList();
+    }
+
     public static void Add(Request request) {
         Validate(request);
 
